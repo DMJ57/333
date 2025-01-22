@@ -49,7 +49,7 @@ jobs:
         # Deploy using Bicep (or ARM template)
         az deployment group create \
           --resource-group "komatsu" \
-          --template-file ./bicep/main.bicep \
+          --template-file ./bicep/linkedservice.bicep \
           --parameters dataFactoryName=ADF033 \
           --parameters linkedServices="$linkedServices"
 
@@ -72,7 +72,7 @@ jobs:
         # Deploy using Bicep (or ARM template)
         az deployment group create \
           --resource-group "komatsu" \
-          --template-file ./bicep/main.bicep \
+          --template-file ./bicep/dataset.bicep \
           --parameters dataFactoryName=ADF033 \
           --parameters datasets="$datasets"
 

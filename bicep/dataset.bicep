@@ -16,6 +16,10 @@ resource dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = [for da
   name: dataset.name
   properties: {
     type: 'AzureBlob'
+    linkedServiceName: {
+      referenceName: 'TestLinkedService'  // Ensure you define the linked service properly
+      type: 'LinkedServiceReference'
+    }
     typeProperties: {
      fileName: dataset.definition.fileName
       folderPath: dataset.definition.folderPath

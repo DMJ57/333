@@ -29,7 +29,7 @@ jobs:
     - name: Login to Azure
       uses: azure/login@v1 
       with:
-        creds: ${{ secrets.AZURE_SPN_CREDENTIAL }}  # Make sure to store your Azure credentials as secrets
+        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Make sure to store your Azure credentials as secrets
 
     - name: Read pipeline JSON files and deploy
       run: |

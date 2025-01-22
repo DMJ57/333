@@ -1,40 +1,48 @@
-param factoryName string
-param location string = resourceGroup().location
+targetScope = 'resourceGroup'  // Set targetScope to resourceGroup
 
-// Parameters for the arrays of file paths
-param linkedServiceFiles array
-param datasetFiles array
-param pipelineFiles array
+param dataFactoryName string
+param linkedServices array
 
-// Define the Azure Data Factory resource
-resource factory 'Microsoft.DataFactory/factories@2018-06-01' = {
-  name: factoryName
-  location: location
+resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {
+  name: dataFactoryName
+  location: 'East US'
 }
+@description('Name of the Azure Storage Account that contains I/O & O/P data')
+param storageAccountName string = 'demokomatsu'
 
-// Deploy Linked Services
-resource linkedServiceDeployments 'Microsoft.Resources/deployments@2021-04-01' = [for linkedServiceFile in linkedServiceFiles: {
-  name: 'linkedServiceDeployment-${linkedServiceFile}'
+
+param storageAccount1 string = 'Y4Fo0vh4xap7U+VravqaJftr++ToUycBATaNeOJ1eLNJZkKyU3e9qZZCIPeLoP03xZmwO/s8gHCc+ASt9ejhfw=='
+
+
+// resource LinkedService 'Microsoft.DataFactory/factories/linkedservices@2018-06-01' = [for linkedService in linkedServices: {
+//   parent: dataFactory
+//   name: '${dataFactory}/${linkedService}'
+//   properties: linkedService.definition
+// }]
+
+resource linkedService 'Microsoft.DataFactory/factories/linkedservices@2018-06-01' = [for linkedService in linkedServices: {
+  parent: dataFactory
+  name: linkedService.name  // Removed the ${dataFactory.name}/ part
   properties: {
-    mode: 'Incremental'
-    template: json(loadTextContent(linkedServiceFile))
+    type: 'AzureBlobStorage'
+    typeProperties: {
+      connectionString: 'DefaultEndpointsProtocol=https;AccountName=${storageAccountName};AccountKey=${storageAccount1};EndpointSuffix=core.windows.net;'
+    }
   }
 }]
 
-// Deploy Datasets
-resource datasetDeployments 'Microsoft.Resources/deployments@2021-04-01' = [for datasetFile in datasetFiles: {
-  name: 'datasetDeployment-${datasetFile}'
+resource dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = [for dataset in datasets: {
+  parent: dataFactory
+  name: dataset.name  // The dataset name (without full path, as we use parent)
   properties: {
-    mode: 'Incremental'
-    template: json(loadTextContent(datasetFile))
-  }
-}]
-
-// Deploy Pipelines
-resource pipelineDeployments 'Microsoft.Resources/deployments@2021-04-01' = [for pipelineFile in pipelineFiles: {
-  name: 'pipelineDeployment-${pipelineFile}'
-  properties: {
-    mode: 'Incremental'
-    template: json(loadTextContent(pipelineFile))
+    type: 'AzureBlob'  // You can change this depending on the dataset type
+    typeProperties: {
+      fileName: dataset.fileName  // Example property
+      folderPath: dataset.folderPath  // Example property
+      linkedServiceName: {
+        referenceName: dataset.linkedServiceName  // Reference to the linked service
+        type: 'LinkedServiceReference'
+      }
+    }
   }
 }]

@@ -1,86 +1,58 @@
-# This is a basic workflow to help you get started with Actions
-
 name: CI-Azure Bicep Deployment
 
-# Controls when the workflow will run
 on:
-  # Triggers the workflow on push or pull request events but only for the "main" branch
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-
-  # Allows you to run this workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
-
-variables:
-  # Define Azure Resource Group and other constants
-  resourceGroup: 'komatsu'
-  location: 'eastus'  # Adjust to your region
-  factoryName: 'ADF033'
-
-
 jobs:
-  # This workflow contains a single job called "build"
   build:
-    # The type of runner that the job will run on
     runs-on: ubuntu-latest
 
-    # Steps represent a sequence of tasks that will be executed as part of the job
+    env:
+      RESOURCE_GROUP: 'komatsu'
+      LOCATION: 'eastus'  # Adjust to your region
+      FACTORY_NAME: 'ADF033'
+
     steps:
-      # Checks-out your repository under $GITHUB_WORKSPACE, so your job can access it
-      - uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v4
 
       - name: Login to Azure
         uses: azure/login@v1
         with:
           creds: ${{ secrets.AZURE_CREDENTIALS }}
 
-      # Step 3: Install Bicep CLI
       - name: Install Bicep CLI
         run: |
           az bicep install
           az bicep upgrade
 
+      - name: Find JSON Files for Linked Services, Datasets, Pipelines
+        id: find_files
+        run: |
+          linkedServiceFiles=$(find ${{ github.workspace }}/linkedServices -name "*.json")
+          datasetFiles=$(find ${{ github.workspace }}/datasets -name "*.json")
+          pipelineFiles=$(find ${{ github.workspace }}/pipelines -name "*.json")
 
+          linkedServiceFilesStr=$(echo "$linkedServiceFiles" | tr '\n' ',' | sed 's/,$//')
+          datasetFilesStr=$(echo "$datasetFiles" | tr '\n' ',' | sed 's/,$//')
+          pipelineFilesStr=$(echo "$pipelineFiles" | tr '\n' ',' | sed 's/,$//')
 
-    # Step to find all .json files in the relevant folders
-  - script: |
-      # Find all linked service .json files
-      linkedServiceFiles=$(find $(Build.SourcesDirectory)/linkedServices -name "*.json")
-      # Find all dataset .json files
-      datasetFiles=$(find $(Build.SourcesDirectory)/datasets -name "*.json")
-      # Find all pipeline .json files
-      pipelineFiles=$(find $(Build.SourcesDirectory)/pipelines -name "*.json")
+          echo "linkedServiceFiles=$linkedServiceFilesStr" >> $GITHUB_ENV
+          echo "datasetFiles=$datasetFilesStr" >> $GITHUB_ENV
+          echo "pipelineFiles=$pipelineFilesStr" >> $GITHUB_ENV
 
-      # Convert the file lists to comma-separated values
-      linkedServiceFilesStr=$(echo "$linkedServiceFiles" | tr '\n' ',' | sed 's/,$//')
-      datasetFilesStr=$(echo "$datasetFiles" | tr '\n' ',' | sed 's/,$//')
-      pipelineFilesStr=$(echo "$pipelineFiles" | tr '\n' ',' | sed 's/,$//')
-
-      # Set the variables for the pipeline
-      echo "##vso[task.setvariable variable=linkedServiceFiles]$linkedServiceFilesStr"
-      echo "##vso[task.setvariable variable=datasetFiles]$datasetFilesStr"
-      echo "##vso[task.setvariable variable=pipelineFiles]$pipelineFilesStr"
-    displayName: 'Find JSON Files for Linked Services, Datasets, Pipelines'
-
-  # Step to deploy the Bicep template to Azure
-  - task: AzureCLI@2
-    displayName: 'Deploy Bicep Template to Azure'
-    inputs:
-      azureSubscription: '<your-azure-subscription>'  # Azure Service Connection
-      scriptType: 'bash'
-      scriptLocation: 'inlineScript'
-      inlineScript: |
-        # Deploy the Bicep template with the found JSON files
-        az deployment group create \
-          --resource-group $(resourceGroup) \
-          --template-file $(Build.SourcesDirectory)/main.bicep \
-          --parameters factoryName=$(factoryName) \
-                       location=$(location) \
-                       linkedServiceFiles=$(linkedServiceFiles) \
-                       datasetFiles=$(datasetFiles) \
-                       pipelineFiles=$(pipelineFiles)
-    displayName: 'Deploy ADF Resources'
+      - name: Deploy Bicep Template to Azure
+        run: |
+          az deployment group create \
+            --resource-group ${{ env.RESOURCE_GROUP }} \
+            --template-file ${{ github.workspace }}/main.bicep \
+            --parameters \
+              factoryName=${{ env.FACTORY_NAME }} \
+              location=${{ env.LOCATION }} \
+              linkedServiceFiles=${{ env.linkedServiceFiles }} \
+              datasetFiles=${{ env.datasetFiles }} \
+              pipelineFiles=${{ env.pipelineFiles }}

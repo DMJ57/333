@@ -17,8 +17,8 @@ resource dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = [for da
   properties: {
     type: 'AzureBlob'
     typeProperties: {
-      fileName: dataset.fileName
-      folderPath: dataset.folderPath
+     fileName: dataset.definition.fileName
+      folderPath: dataset.definition.folderPath
       // Remove linkedServiceName as it's not allowed
     }
   }

@@ -1,19 +1,14 @@
 {
-	"name": "TestDataset",
-	"properties": {
-		"linkedServiceName": {
-			"referenceName": "TestLinkedService",
-			"type": "LinkedServiceReference"
-		},
-		"annotations": [],
-		"type": "AzureBlob",
-		"typeProperties": {
-			"format": {
-				"type": "TextFormat",
-				"treatEmptyAsNull": true
-			},
-			"folderPath": "adfcontainer"
-		}
-	},
-	"type": "Microsoft.DataFactory/factories/datasets"
+  "name": "TestDataset",
+  "properties": {
+    "linkedServiceName": {
+      "referenceName": "TestLinkedService",  // Name of the linked service
+      "type": "LinkedServiceReference"
+    },
+    "type": "AzureBlob",
+    "typeProperties": {
+      "folderPath": "folder/within/blob",
+      "fileName": "example.csv"  // Assuming the dataset is targeting a CSV file
+    }
+  }
 }

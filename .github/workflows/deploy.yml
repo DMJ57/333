@@ -64,7 +64,7 @@ jobs:
           --arg dataset1 "$dataset1" \
           '[
             {
-              "name": "TestLinkedService",
+              "name": "TestDataset",
               "definition": $dataset1 | fromjson
             }
           ]')

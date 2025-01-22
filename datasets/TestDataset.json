@@ -2,13 +2,13 @@
   "name": "TestDataset",
   "properties": {
     "linkedServiceName": {
-      "referenceName": "TestLinkedService",  // Name of the linked service
+      "referenceName": "TestLinkedService", 
       "type": "LinkedServiceReference"
     },
     "type": "AzureBlob",
     "typeProperties": {
       "folderPath": "folder/within/blob",
-      "fileName": "example.csv"  // Assuming the dataset is targeting a CSV file
+      "fileName": "example.csv" 
     }
   }
 }

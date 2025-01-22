@@ -13,16 +13,13 @@ param storageAccountName string = 'demokomatsu'
 
 resource dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = [for dataset in datasets: {
   parent: dataFactory
-  name: dataset.name  // The dataset name (without full path, as we use parent)
+  name: dataset.name
   properties: {
-    type: 'AzureBlob'  // You can change this depending on the dataset type
+    type: 'AzureBlob'
     typeProperties: {
-      fileName: dataset.fileName  // Example property
-      folderPath: dataset.folderPath  // Example property
-      linkedServiceName: {
-        referenceName: dataset.linkedServiceName  // Reference to the linked service
-        type: 'LinkedServiceReference'
-      }
+      fileName: dataset.fileName
+      folderPath: dataset.folderPath
+      // Remove linkedServiceName as it's not allowed
     }
   }
 }]

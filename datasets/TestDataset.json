@@ -1,0 +1,19 @@
+{
+	"name": "TestDataset",
+	"properties": {
+		"linkedServiceName": {
+			"referenceName": "TestLinkedService",
+			"type": "LinkedServiceReference"
+		},
+		"annotations": [],
+		"type": "AzureBlob",
+		"typeProperties": {
+			"format": {
+				"type": "TextFormat",
+				"treatEmptyAsNull": true
+			},
+			"folderPath": "adfcontainer"
+		}
+	},
+	"type": "Microsoft.DataFactory/factories/datasets"
+}

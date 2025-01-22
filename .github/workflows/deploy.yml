@@ -49,7 +49,7 @@ jobs:
         # Deploy using Bicep (or ARM template)
         az deployment group create \
           --resource-group "komatsu" \
-          --template-file ./bicep/modules/linkedservice.bicep \
+          --template-file ./bicep/main.bicep \
           --parameters dataFactoryName=ADF033 \
           --parameters linkedServices="$linkedServices"
 
@@ -57,24 +57,24 @@ jobs:
     - name: Read pipeline Dataset JSON files and deploy
       run: |
         # Ensure the correct path to the JSON files
-        linkedService1=$(cat ./datasets/TestDataset.json)
+        dataset1=$(cat ./datasets/TestDataset.json)
 
         # Construct a JSON array with the pipeline contents
-        linkedServices=$(jq -n \
-          --arg linkedService1 "$linkedService1" \
+        datasets=$(jq -n \
+          --arg dataset1 "$dataset1" \
           '[
             {
               "name": "TestLinkedService",
-              "definition": $linkedService1 | fromjson
+              "definition": $dataset1 | fromjson
             }
           ]')
 
         # Deploy using Bicep (or ARM template)
         az deployment group create \
           --resource-group "komatsu" \
-          --template-file ./bicep/modules/linkedservice.bicep \
+          --template-file ./bicep/main.bicep \
           --parameters dataFactoryName=ADF033 \
-          --parameters linkedServices="$linkedServices"
+          --parameters datasets="$datasets"
 
 
         

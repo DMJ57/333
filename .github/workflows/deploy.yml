@@ -34,7 +34,7 @@ jobs:
     - name: Read pipeline JSON files and deploy
       run: |
         # Ensure the correct path to the JSON files
-        linkedService1=$(cat ./linkedService/TestLinkedService.json)
+        linkedService1=$(cat ./linkedServices/TestLinkedService.json)
 
         # Construct a JSON array with the pipeline contents
         linkedServices=$(jq -n \

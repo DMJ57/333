@@ -3,10 +3,10 @@ name: Deploy ADF Pipelines
 on:
   push:
     branches:
-      - souvikTestADF  # Trigger the workflow on push to the main branch
+      - main  # Trigger the workflow on push to the main branch
   pull_request:
     branches:
-      - souvikTestADF  # Trigger the workflow on pull requests to the main branch
+      - main  # Trigger the workflow on pull requests to the main branch
 
 jobs:
   deploy:

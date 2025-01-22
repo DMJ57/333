@@ -1,7 +1,7 @@
 targetScope = 'resourceGroup'  // Set targetScope to resourceGroup
 
 param dataFactoryName string
-param linkedsServices array
+param linkedServices array
 param datasets array
 
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' = {

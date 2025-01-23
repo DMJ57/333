@@ -13,68 +13,54 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v2
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-    - name: Set up Azure CLI
-      uses: azure/CLI@v1
-      with:
-        azcliversion: '2.30.0'  # Correct input for specifying Azure CLI version
-        inlineScript: |
-          az --version  # Example inline script to verify Azure CLI setup
+      - name: Set up Azure CLI
+        uses: azure/CLI@v1
+        with:
+          azcliversion: '2.30.0'  # Correct input for specifying Azure CLI version
+          inlineScript: |
+            az --version  # Example inline script to verify Azure CLI setup
 
-    - name: Install jq
-      run: sudo apt-get install jq
+      - name: Install jq
+        run: sudo apt-get install jq
 
-    - name: Login to Azure
-      uses: azure/login@v1 
-      with:
-        creds: ${{ secrets.AZURE_CREDENTIALS }}  # Make sure to store your Azure credentials as secrets
+      - name: Login to Azure
+        uses: azure/login@v1
+        with:
+          creds: ${{ secrets.AZURE_CREDENTIALS }}  # Make sure to store your Azure credentials as secrets
 
-    - name: Read pipeline JSON files and deploy
-      run: |
-        # Ensure the correct path to the JSON files
-        linkedService1=$(cat ./linkedServices/TestLinkedService.json)
+      - name: Read pipeline Dataset JSON files and deploy
+        run: |
+          # Ensure the correct path to the JSON files
+          dataset1=$(cat ./datasets/TestDataset.json)
+          dataset2=$(cat ./datasets/TestDataset2.json)
+          dataset3=$(cat ./datasets/komatsu_test.json)
 
-        # Construct a JSON array with the pipeline contents
-        linkedServices=$(jq -n \
-          --arg linkedService1 "$linkedService1" \
-          '[
-            {
-              "name": "TestLinkedService",
-              "definition": $linkedService1 | fromjson
-            }
-          ]')
+          # Construct a JSON array with the pipeline contents
+          datasets=$(jq -n \
+            --arg dataset1 "$dataset1" \
+            --arg dataset2 "$dataset2" \
+            --arg dataset3 "$dataset3" \
+            '[
+              {
+                "name": "TestDataset",
+                "definition": $dataset1 | fromjson
+              },
+              {
+                "name": "TestDataset2",
+                "definition": $dataset2 | fromjson
+              },
+              {
+                "name": "Abc",
+                "definition": $dataset3 | fromjson
+              }
+            ]')
 
-        # Deploy using Bicep (or ARM template)
-        az deployment group create \
-          --resource-group "komatsu" \
-          --template-file ./bicep/linkedservice.bicep \
-          --parameters dataFactoryName=ADF033 \
-          --parameters linkedServices="$linkedServices"
-
-        
-    - name: Read pipeline Dataset JSON files and deploy
-      run: |
-        # Ensure the correct path to the JSON files
-        dataset1=$(cat ./datasets/TestDataset.json)
-
-        # Construct a JSON array with the pipeline contents
-        datasets=$(jq -n \
-          --arg dataset1 "$dataset1" \
-          '[
-            {
-              "name": "TestDataset",
-              "definition": $dataset1 | fromjson
-            }
-          ]')
-
-        # Deploy using Bicep (or ARM template)
-        az deployment group create \
-          --resource-group "komatsu" \
-          --template-file ./bicep/dataset.bicep \
-          --parameters dataFactoryName=ADF033 \
-          --parameters datasets="$datasets"
-
-
-        
+          # Deploy using Bicep (or ARM template)
+          az deployment group create \
+            --resource-group "komatsu" \
+            --template-file ./bicep/dataset.bicep \
+            --parameters dataFactoryName=ADF033 \
+            --parameters datasets="$datasets"

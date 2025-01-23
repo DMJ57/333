@@ -8,7 +8,7 @@
     "type": "AzureBlob",
     "typeProperties": {
       "folderPath": "folder/within/blob",
-      "name": "example.csv" 
+      "fileName": "example.csv" 
     }
   }
 }

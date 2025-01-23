@@ -1,0 +1,14 @@
+{
+  "name": "Abc",
+  "properties": {
+    "linkedServiceName": {
+      "referenceName": "TestLinkedService", 
+      "type": "LinkedServiceReference"
+    },
+    "type": "AzureBlob",
+    "typeProperties": {
+      "folderPath": "folder/within/blob",
+      "fileName": "example2.csv" 
+    }
+  }
+}

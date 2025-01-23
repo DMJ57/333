@@ -21,8 +21,8 @@ resource dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = [for da
       type: 'LinkedServiceReference'
     }
     typeProperties: {
-     fileName: dataset.definition.fileName
-      folderPath: dataset.definition.folderPath
+     fileName: dataset.definition.typeProperties.fileName
+      folderPath: dataset.definition.typeProperties.folderPath
       // Remove linkedServiceName as it's not allowed
     }
   }

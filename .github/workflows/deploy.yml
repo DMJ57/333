@@ -49,6 +49,6 @@ jobs:
           # Deploy using Bicep (or ARM template)
           az deployment group create \
             --resource-group "komatsu" \
-            --template-file ./bicep/dataset.bicep \
+            --template-file ./bicep/dataflow.bicep \
             --parameters dataFactoryName=ADF033 \
             --parameters dataflows="$dataflows"

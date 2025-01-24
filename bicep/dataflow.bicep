@@ -1,4 +1,5 @@
 param dataFactoryName string
+param dataflows array
 
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
   name: dataFactoryName

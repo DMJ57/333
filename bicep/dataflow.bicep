@@ -40,24 +40,7 @@ resource dataFlowsResources 'Microsoft.DataFactory/factories/dataflows@2018-06-0
         }
       ]
       transformations: [] // No transformations defined in this example
-      scriptLines: [
-        'source(output(',
-        '          Name as string,',
-        '          Company as string',
-        '     ),',
-        '     allowSchemaDrift: true,',
-        '     validateSchema: false,',
-        '     ignoreNoFilesFound: false,',
-        '     documentForm: \'documentPerLine\') ~> source1',
-        'source1 sink(allowSchemaDrift: true,',
-        '     validateSchema: false,',
-        '     input(',
-        '          Name as string,',
-        '          Company as string',
-        '     ),',
-        '     skipDuplicateMapInputs: true,',
-        '     skipDuplicateMapOutputs: true) ~> sink1'
-      ]
+      scriptLines: []
     }
   }
 }]

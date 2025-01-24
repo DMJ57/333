@@ -1,4 +1,8 @@
-param dataFactoryName string = 'yourDataFactoryName'
+param dataFactoryName 
+
+resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
+  name: dataFactoryName
+}
 
 var dataFlows = [
   {
@@ -9,6 +13,7 @@ var dataFlows = [
     sourceFolderPath: 'customerdata/'
     sinkLinkedServiceName: 'AzureSqlLinkedService'
     sinkTableName: 'CustomerTable'
+    type: 'MappingDataFlow'
   }
   {
     name: 'DataFlow2'
@@ -18,13 +23,15 @@ var dataFlows = [
     sourceFolderPath: 'transactiondata/'
     sinkLinkedServiceName: 'AzureSqlLinkedService'
     sinkTableName: 'TransactionTable'
+    type: 'MappingDataFlow'
   }
 ]
 
 resource dataFlowsResources 'Microsoft.DataFactory/factories/dataflows@2018-06-01' = [for dataFlow in dataFlows: {
-  parent: dataFactoryName
+  parent: dataFactory
   name: dataFlow.name
   properties: {
+    type: dataFlow.type
     description: dataFlow.description
     activities: [
       {
@@ -59,4 +66,3 @@ resource dataFlowsResources 'Microsoft.DataFactory/factories/dataflows@2018-06-0
     ]
   }
 }]
-

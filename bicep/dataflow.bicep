@@ -6,23 +6,10 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
 
 var dataFlows = [
   {
-    name: 'DataFlow1'
-    description: 'Data flow for processing customer data'
-    sourceLinkedServiceName: 'AzureBlobStorageLinkedService'
-    sourceFileName: 'customers.csv'
-    sourceFolderPath: 'customerdata/'
-    sinkLinkedServiceName: 'AzureSqlLinkedService'
-    sinkTableName: 'CustomerTable'
-    type: 'MappingDataFlow'
-  }
-  {
-    name: 'DataFlow2'
-    description: 'Data flow for processing transaction data'
-    sourceLinkedServiceName: 'AzureBlobStorageLinkedService'
-    sourceFileName: 'transactions.csv'
-    sourceFolderPath: 'transactiondata/'
-    sinkLinkedServiceName: 'AzureSqlLinkedService'
-    sinkTableName: 'TransactionTable'
+    name: 'dataflow1'
+    description: 'Data flow for processing JSON data'
+    sourceDatasetName: 'Json1' // Source Dataset Name
+    sinkDatasetName: 'Json2' // Sink Dataset Name
     type: 'MappingDataFlow'
   }
 ]
@@ -36,36 +23,40 @@ resource dataFlowsResources 'Microsoft.DataFactory/factories/dataflows@2018-06-0
     typeProperties: {
       sources: [
         {
-          name: 'SourceActivity'
-          type: 'Source'
-          linkedServiceName: {
-            referenceName: dataFlow.sourceLinkedServiceName
-            type: 'LinkedServiceReference'
-          }
-          typeProperties: {
-            source: {
-              type: 'DelimitedText'
-              fileName: dataFlow.sourceFileName
-              folderPath: dataFlow.sourceFolderPath
-            }
+          name: 'source1'
+          dataset: {
+            referenceName: dataFlow.sourceDatasetName
+            type: 'DatasetReference'
           }
         }
       ]
       sinks: [
         {
-          name: 'SinkActivity'
-          type: 'Sink'
-          linkedServiceName: {
-            referenceName: dataFlow.sinkLinkedServiceName
-            type: 'LinkedServiceReference'
-          }
-          typeProperties: {
-            sink: {
-              type: 'AzureSqlSink'
-              tableName: dataFlow.sinkTableName
-            }
+          name: 'sink1'
+          dataset: {
+            referenceName: dataFlow.sinkDatasetName
+            type: 'DatasetReference'
           }
         }
+      ]
+      transformations: [] // No transformations defined in this example
+      scriptLines: [
+        'source(output(',
+        '          Name as string,',
+        '          Company as string',
+        '     ),',
+        '     allowSchemaDrift: true,',
+        '     validateSchema: false,',
+        '     ignoreNoFilesFound: false,',
+        '     documentForm: \'documentPerLine\') ~> source1',
+        'source1 sink(allowSchemaDrift: true,',
+        '     validateSchema: false,',
+        '     input(',
+        '          Name as string,',
+        '          Company as string',
+        '     ),',
+        '     skipDuplicateMapInputs: true,',
+        '     skipDuplicateMapOutputs: true) ~> sink1'
       ]
     }
   }

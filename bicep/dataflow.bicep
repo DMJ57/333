@@ -6,7 +6,8 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
 }
 
 resource jsonDataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
-  name: '${dataFactoryName}/Json1'
+  parent: dataFactory
+  name: 'Json1'
   properties: {
     linkedServiceName: {
       referenceName: 'TestLinkedService'
@@ -36,7 +37,8 @@ resource jsonDataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
 }
 
 resource json2Dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
-  name: '${dataFactoryName}/Json2'
+  parent: dataFactory
+  name: 'Json2'
   properties: {
     linkedServiceName: {
       referenceName: 'TestLinkedService'

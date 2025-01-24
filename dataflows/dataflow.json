@@ -1,64 +1,45 @@
 {
-  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentTemplate.json#",
-  "contentVersion": "1.0.0.0",
-  "resources": [
-    {
-      "type": "Microsoft.DataFactory/factories/dataflows",
-      "apiVersion": "2018-06-01",
-      "name": "[concat(parameters('dataFactoryName'), '/', variables('dataFlowName'))]",
-      "properties": {
-        "description": "[variables('dataFlowDescription')]",
-        "activities": [
-          {
-            "name": "SourceActivity",
-            "type": "Source",
-            "linkedServiceName": {
-              "referenceName": "[variables('sourceLinkedServiceName')]",
-              "type": "LinkedServiceReference"
-            },
-            "typeProperties": {
-              "source": {
-                "type": "DelimitedText",
-                "fileName": "[variables('sourceFileName')]",
-                "folderPath": "[variables('sourceFolderPath')]"
-              }
-            }
-          },
-          {
-            "name": "SinkActivity",
-            "type": "Sink",
-            "linkedServiceName": {
-              "referenceName": "[variables('sinkLinkedServiceName')]",
-              "type": "LinkedServiceReference"
-            },
-            "typeProperties": {
-              "sink": {
-                "type": "AzureSqlSink",
-                "tableName": "[variables('sinkTableName')]"
-              }
-            }
-          }
-        ]
-      }
-    }
-  ],
-  "variables": {
-    "dataFactoryName": "yourDataFactoryName",
-    "dataFlowName": "DataFlow1", 
-    "dataFlowDescription": "Data flow for processing customer data",
-    "sourceLinkedServiceName": "AzureBlobStorageLinkedService",
-    "sourceFileName": "customers.csv",
-    "sourceFolderPath": "customerdata/",
-    "sinkLinkedServiceName": "AzureSqlLinkedService",
-    "sinkTableName": "CustomerTable"
-  },
-  "parameters": {
-    "dataFactoryName": {
-      "type": "string",
-      "defaultValue": "yourDataFactoryName",
-      "metadata": {
-        "description": "Name of the Data Factory"
-      }
-    }
-  }
+	"name": "dataflow1",
+	"properties": {
+		"type": "MappingDataFlow",
+		"typeProperties": {
+			"sources": [
+				{
+					"dataset": {
+						"referenceName": "Json1",
+						"type": "DatasetReference"
+					},
+					"name": "source1"
+				}
+			],
+			"sinks": [
+				{
+					"dataset": {
+						"referenceName": "Json2",
+						"type": "DatasetReference"
+					},
+					"name": "sink1"
+				}
+			],
+			"transformations": [],
+			"scriptLines": [
+				"source(output(",
+				"          Name as string,",
+				"          Company as string",
+				"     ),",
+				"     allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     ignoreNoFilesFound: false,",
+				"     documentForm: 'documentPerLine') ~> source1",
+				"source1 sink(allowSchemaDrift: true,",
+				"     validateSchema: false,",
+				"     input(",
+				"          Name as string,",
+				"          Company as string",
+				"     ),",
+				"     skipDuplicateMapInputs: true,",
+				"     skipDuplicateMapOutputs: true) ~> sink1"
+			]
+		}
+	}
 }

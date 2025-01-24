@@ -34,27 +34,15 @@ jobs:
       - name: Read pipeline Dataset JSON files and deploy
         run: |
           # Ensure the correct path to the JSON files
-          dataset1=$(cat ./datasets/TestDataset.json)
-          dataset2=$(cat ./datasets/TestDataset2.json)
-          dataset3=$(cat ./datasets/komatsu_test.json)
+          dataset1=$(cat ./dataflows/dataflow.json)
 
           # Construct a JSON array with the pipeline contents
-          datasets=$(jq -n \
-            --arg dataset1 "$dataset1" \
-            --arg dataset2 "$dataset2" \
-            --arg dataset3 "$dataset3" \
+          dataflows=$(jq -n \
+            --arg dataflow1 "$dataflow1" \
             '[
               {
-                "name": "TestDataset",
-                "definition": $dataset1 | fromjson
-              },
-              {
-                "name": "TestDataset2",
-                "definition": $dataset2 | fromjson
-              },
-              {
                 "name": "Abc",
-                "definition": $dataset3 | fromjson
+                "definition": $dataflow1 | fromjson
               }
             ]')
 
@@ -63,4 +51,4 @@ jobs:
             --resource-group "komatsu" \
             --template-file ./bicep/dataset.bicep \
             --parameters dataFactoryName=ADF033 \
-            --parameters datasets="$datasets"
+            --parameters dataflows="$dataflows"

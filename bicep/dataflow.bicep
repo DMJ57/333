@@ -5,6 +5,65 @@ resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
   name: dataFactoryName
 }
 
+resource jsonDataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
+  name: '${dataFactoryName}/Json1'
+  properties: {
+    linkedServiceName: {
+      referenceName: 'TestLinkedService'
+      type: 'LinkedServiceReference'
+    }
+    annotations: []
+    type: 'Json'
+    typeProperties: {
+      location: {
+        type: 'AzureBlobStorageLocation'
+        fileName: 'TestInput.json'
+        container: 'demokoma'
+      }
+    }
+    schema: {
+      type: 'object'
+      properties: {
+        Name: {
+          type: 'string'
+        }
+        Company: {
+          type: 'string'
+        }
+      }
+    }
+  }
+}
+
+resource json2Dataset 'Microsoft.DataFactory/factories/datasets@2018-06-01' = {
+  name: '${dataFactoryName}/Json2'
+  properties: {
+    linkedServiceName: {
+      referenceName: 'TestLinkedService'
+      type: 'LinkedServiceReference'
+    }
+    annotations: []
+    type: 'Json'
+    typeProperties: {
+      location: {
+        type: 'AzureBlobStorageLocation'
+        container: 'demokoma'
+      }
+    }
+    schema: {
+      type: 'object'
+      properties: {
+        Name: {
+          type: 'string'
+        }
+        Company: {
+          type: 'string'
+        }
+      }
+    }
+  }
+}
+
 var dataFlows = [
   {
     name: 'dataflow1'

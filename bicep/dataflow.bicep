@@ -1,4 +1,4 @@
-param dataFactoryName 
+param dataFactoryName string
 
 resource dataFactory 'Microsoft.DataFactory/factories@2018-06-01' existing = {
   name: dataFactoryName
@@ -33,36 +33,40 @@ resource dataFlowsResources 'Microsoft.DataFactory/factories/dataflows@2018-06-0
   properties: {
     type: dataFlow.type
     description: dataFlow.description
-    activities: [
-      {
-        name: 'SourceActivity'
-        type: 'Source'
-        linkedServiceName: {
-          referenceName: dataFlow.sourceLinkedServiceName
-          type: 'LinkedServiceReference'
-        }
-        typeProperties: {
-          source: {
-            type: 'DelimitedText'
-            fileName: dataFlow.sourceFileName
-            folderPath: dataFlow.sourceFolderPath
+    typeProperties: {
+      sources: [
+        {
+          name: 'SourceActivity'
+          type: 'Source'
+          linkedServiceName: {
+            referenceName: dataFlow.sourceLinkedServiceName
+            type: 'LinkedServiceReference'
+          }
+          typeProperties: {
+            source: {
+              type: 'DelimitedText'
+              fileName: dataFlow.sourceFileName
+              folderPath: dataFlow.sourceFolderPath
+            }
           }
         }
-      }
-      {
-        name: 'SinkActivity'
-        type: 'Sink'
-        linkedServiceName: {
-          referenceName: dataFlow.sinkLinkedServiceName
-          type: 'LinkedServiceReference'
-        }
-        typeProperties: {
-          sink: {
-            type: 'AzureSqlSink'
-            tableName: dataFlow.sinkTableName
+      ]
+      sinks: [
+        {
+          name: 'SinkActivity'
+          type: 'Sink'
+          linkedServiceName: {
+            referenceName: dataFlow.sinkLinkedServiceName
+            type: 'LinkedServiceReference'
+          }
+          typeProperties: {
+            sink: {
+              type: 'AzureSqlSink'
+              tableName: dataFlow.sinkTableName
+            }
           }
         }
-      }
-    ]
+      ]
+    }
   }
 }]
